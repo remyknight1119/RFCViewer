@@ -4,13 +4,15 @@ import tkinter.ttk as ttk
 from functools import partial
 from tkinter import filedialog
 
-def add_tab(file_path, root, blank_text_box):
+def add_tab(file_path, notebook, blank_text_box):
     # 打开文件并读取内容
     with open(file_path, "r") as file:
         content = file.read()
 
-    notebook = ttk.Notebook(root)
     notebook.pack()
+
+    #sidebar = ttk.Frame(notebook, width=200)
+    #sidebar.pack(side=tk.LEFT, fill=tk.Y)
 
     frame = ttk.Frame(notebook)
 
@@ -32,17 +34,23 @@ def add_tab(file_path, root, blank_text_box):
     notebook.pack(expand=True, fill=tk.BOTH)
 
 
-def open_file(root, blank_text_box):
+def open_file(notebook, blank_text_box):
     file_path = filedialog.askopenfilename()
     if file_path:
-        add_tab(file_path, root, blank_text_box)
+        add_tab(file_path, notebook, blank_text_box)
+
+def close_file(notebook, blank_text_box):
+    current_tab_index = notebook.index(notebook.select())
+    notebook.forget(current_tab_index)
+    blank_text_box.pack(expand=True, fill=tk.BOTH)
 
 
 def file_menu_add(menu, root):
     blank_text_box = tk.Text(root)
     blank_text_box.pack(expand=True, fill=tk.BOTH)
-    menu.add_command(label="Open", command=partial(open_file, root, blank_text_box))
-    menu.add_command(label="Close")
+    notebook = ttk.Notebook(root)
+    menu.add_command(label="Open", command=partial(open_file, notebook, blank_text_box))
+    menu.add_command(label="Close", command=partial(close_file, notebook, blank_text_box))
     menu.add_separator()
     menu.add_command(label="Exit", command=root.quit)
     return "File"
